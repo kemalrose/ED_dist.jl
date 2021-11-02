@@ -101,6 +101,17 @@ EDdist(A, u)
 
 
 
+function IncidenceCompleteGraph(n:: Int)
+    Incidence = ones(Int, n, n)
+    for i in 1:n
+        Incidence[i, i] = 0
+    end
+    Incidence
+end
+
+
+
+
 
 IncidenceKarate = [
  0 1 1 1 1 1 1 1 1 0 1 1 1 1 0 0 0 1 0 1 0 1 0 0 0 0 0 0 0 0 0 1 0 0;
@@ -139,75 +150,26 @@ IncidenceKarate = [
  0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 1 0 0 1 1 1 0 1 1 0 0 1 1 1 1 1 1 1 0
 ]
 
+IncidenceKarate = IncidenceKarate[1:15,1:15]
+
+
+
 A = [0 1 1 1; 1 0 0 0; 1 0 0 0; 1 0 0 0]
 Bin  = binom_mod(IncidenceKarate)
-colours = rand(1:2, 34)
+colours = rand(1:2, size(IncidenceKarate)[1])
 Beta = β_mod(IncidenceKarate, colours)
 
 Edges = edge_list(IncidenceKarate)
 print(Beta[end, :])
 print([colours[edge[1]] != colours[edge[2]] for edge in Edges])
 
-m, k = size(Bin)
-
-@var u[1:k]
-
-
-θ, q = to_system(Bin)
-
-G = differentiate(q,θ)
-
-Q = System(q)
-
-λ = randn(ComplexF64, k)
-
-D = diagm(λ)
-
-F = transpose(G)
-
-M = F*D
-#we need θ₀ and u₀ to use monodromy_solve
-θ₀ = randn(ComplexF64,m)
-# define u₀
-M₀ = [subs(M[i,j],θ => θ₀) for (i,j) in Iterators.product(1:m ,1:k)]
-w = nullspace(convert(Matrix{ComplexF64},M₀))
-n = w[:,1]
-q₀ = Q(θ₀)
-u₀ = q₀ - n
-
-# the system where u are the parameters and θ are the variables
-S = System(M*(q-u), variables=θ, parameters=u)
-d(θ₁, θ₂) = norm(Q(θ₁) - Q(θ₂), Inf)
-@time MS = monodromy_solve(S, [θ₀], u₀,distance = d)
-
-R = solutions(MS)
-
-### test
-qs = map(s->Q(s),R)
-length(unique_points(qs)) == 36
 
 
 
-certify(S, R, target_parameters = u₀)
+#H,U = HomotopyContinuation.hnf(transpose(Bin))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-H,U = HomotopyContinuation.hnf(transpose(Q))
-
-A=transpose(H)
+#A=transpose(H)
+A = reparametrise(Bin)
 
 m,n = size(A)
 
