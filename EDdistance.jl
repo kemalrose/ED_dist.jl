@@ -41,8 +41,8 @@ function EDdeg(A::Matrix, generic::Bool=false)
 end
 
 function criticals(A::Matrix, u::Vector{Float64}=randn(Float64,size(A)[2]), λ::Vector=ones(size(A)[2]))
-    x, q = to_system(A)
-    criticals(x,q,u,λ)
+    θ, q = to_system(A)
+    criticals(θ,q,u,λ)
 end
 
 function criticals(x::Vector{Variable}, q::Vector, u::Vector{Float64}=randn(Float64,length(q)), λ::Vector=ones(length(q)))

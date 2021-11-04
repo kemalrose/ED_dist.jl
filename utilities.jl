@@ -33,7 +33,7 @@ function to_system(A)
     #Takes an integral n times m matrix and returns m monomials in n variables
     (n, m) = size(A)
     @var θ[1:n]
-    q=[prod(x[i]^A[i,j] for i in 1:n) for j in 1:m]
+    q=[prod(θ[i]^A[i,j] for i in 1:n) for j in 1:m]
     θ, q
 end
 
